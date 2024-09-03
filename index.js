@@ -6,6 +6,7 @@ require("./config/database");
 const port = process.env.PORT;
 require("dotenv").config();
 
+app.use(cors());
 app.use(express.json());
 
 app.use("/api", authRoute);
