@@ -57,4 +57,21 @@ async function saveService(req, res) {
   }
 }
 
-module.exports = { saveService };
+async function fetchService(req, res) {
+  try {
+    let services = await Service.find();
+    const baseUrl = "https://himalayanjava-server.onrender.com";
+    const result = services.map((service) => {
+      const serviceObject = service.toObject();
+      return {
+        ...serviceObject,
+        image: `${baseUrl}${serviceObject.image}`,
+      };
+    });
+    res.send(result);
+  } catch (err) {
+    res.status(500).send("Server Error");
+  }
+}
+
+module.exports = { saveService, fetchService };
