@@ -28,7 +28,7 @@ function forgotPassword(req, res) {
       from: process.env.ADMIN_EMAIL,
       to: email,
       subject: "Reset your password",
-      text: `https://himalayanjava-admin.vercel.app/resetpassword/${user._id}/${token}`,
+      text: `https://himalayanjava-admin.vercel.app/`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
