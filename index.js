@@ -4,6 +4,7 @@ const cors = require("cors");
 const authRoute = require("./route/auth");
 const forgotPasswordRoute = require("./route/forgotPassword");
 const serviceRoute = require("./route/service");
+const menuRoute = require("./route/menu");
 require("./config/database");
 const port = process.env.PORT;
 require("dotenv").config();
@@ -20,6 +21,8 @@ app.use("/", forgotPasswordRoute);
 app.use("/api", authRoute);
 
 app.use("/", serviceRoute);
+
+app.use("/", menuRoute);
 
 app.listen(port, () => {
   console.log("server is running");
