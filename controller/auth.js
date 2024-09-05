@@ -3,6 +3,7 @@ const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const User = require("../model/User");
 require("dotenv").config();
+const path = require("path");
 
 async function signup(req, res) {
   try {
@@ -70,4 +71,70 @@ async function login(req, res) {
   res.status(401).send({ msg: "Invalid credentials!!" });
 }
 
-module.exports = { signup: signup, login: login };
+async function updateProfile(req, res) {
+  try {
+    const { userId } = req.params;
+    const { businessname, username, email, password } = req.body;
+
+    let imagePath = "";
+    if (req.files?.image) {
+      const uploadFile = req.files.image;
+      const extension = path.extname(uploadFile.name);
+      const fileName = path.parse(uploadFile.name).name;
+      const rootpath = path.resolve();
+      const newFileName = `${fileName}-${Date.now()}${extension}`;
+      const finalPath = path.join(rootpath, "uploads", newFileName);
+      imagePath = `/uploads/${newFileName}`;
+
+      uploadFile.mv(finalPath, (err) => {
+        if (err) {
+          console.error("Error moving file:", err);
+          return res.status(500).json({ msg: "Error uploading image" });
+        }
+      });
+    }
+
+    const updateFields = {
+      businessname,
+      image: imagePath,
+      username,
+      email,
+      password,
+    };
+
+    // for (let key in updateFields) {
+    //   if (updateFields[key] === undefined) {
+    //     delete updateFields[key];
+    //   }
+    // }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields);
+
+    res.status(200).send({ msg: "Profile updated successfully", updatedUser });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ msg: "Server error" });
+  }
+}
+
+async function fetchUser(req, res) {
+  try {
+    let { userId } = req.params;
+    let userdetails = await User.findOne({ _id: userId });
+    if (userdetails) {
+      res.send(userdetails);
+    } else {
+      res.status(404).send("User not found");
+    }
+  } catch (err) {
+    console.log({ Error: err });
+    res.status(500).send({ msg: "Server error" });
+  }
+}
+
+module.exports = {
+  signup: signup,
+  login: login,
+  updateProfile: updateProfile,
+  fetchUser: fetchUser,
+};

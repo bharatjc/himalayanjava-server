@@ -7,6 +7,7 @@ const serviceRoute = require("./route/service");
 const menuRoute = require("./route/menu");
 const outletRoute = require("./route/outlet");
 const customerRoute = require("./route/customer");
+const viewerRoute = require("./route/viewer");
 require("./config/database");
 const port = process.env.PORT;
 require("dotenv").config();
@@ -29,6 +30,8 @@ app.use("/", menuRoute);
 app.use("/", outletRoute);
 
 app.use("/", customerRoute);
+
+app.use("/", viewerRoute);
 
 app.listen(port, () => {
   console.log("server is running");

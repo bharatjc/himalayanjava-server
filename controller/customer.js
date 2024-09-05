@@ -69,7 +69,7 @@ async function fetchCustomer(req, res) {
     const result = customers.map((customer) => {
       const customerObject = customer.toObject();
       return {
-        ...customeruObject,
+        ...customerObject,
         image: `${baseUrl}${customerObject.image}`,
       };
     });
