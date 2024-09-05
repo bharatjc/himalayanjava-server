@@ -120,9 +120,16 @@ async function updateProfile(req, res) {
 async function fetchUser(req, res) {
   try {
     let { userId } = req.params;
+    let baseUrl = "https://himalayanjava-server.onrender.com";
     let userdetails = await User.findOne({ _id: userId });
     if (userdetails) {
-      res.send(userdetails);
+      const userObject = userdetails.toObject();
+      const realImage = userdetails.image;
+      let result = {
+        ...userObject,
+        image: baseUrl + realImage,
+      };
+      res.send(result);
     } else {
       res.status(404).send("User not found");
     }
