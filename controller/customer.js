@@ -7,6 +7,7 @@ async function saveCustomer(req, res) {
     const CustomerSchema = Joi.object({
       name: Joi.string().required().max(30),
       email: Joi.string().email().required(),
+      profession: Joi.string().required().max(30),
       rating: Joi.number().required(),
       comment: Joi.string().required(),
     });
