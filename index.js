@@ -21,7 +21,7 @@ app.use(fileUpload());
 
 app.use("/", forgotPasswordRoute);
 
-app.use("/api", authRoute);
+app.use("/", authRoute);
 
 app.use("/", serviceRoute);
 
