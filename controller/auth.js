@@ -69,6 +69,8 @@ async function login(req, res) {
         let baseUrl = "https://himalayanjava-server.onrender.com";
         let result = baseUrl + user.image;
         user.image = result;
+      } else {
+        user.image = "";
       }
       res.send({ data: user });
       return;
