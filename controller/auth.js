@@ -64,6 +64,12 @@ async function login(req, res) {
       const JWT_SECRET_KEY = process.env.SECRET_KEY;
       let token = jwt.sign(user, JWT_SECRET_KEY);
       user.token = token;
+
+      if (user.image) {
+        let baseUrl = "https://himalayanjava-server.onrender.com";
+        let result = baseUrl + user.image;
+        user.image = result;
+      }
       res.send({ data: user });
       return;
     }
@@ -101,12 +107,6 @@ async function updateProfile(req, res) {
       email,
       password,
     };
-
-    // for (let key in updateFields) {
-    //   if (updateFields[key] === undefined) {
-    //     delete updateFields[key];
-    //   }
-    // }
 
     const updatedUser = await User.findByIdAndUpdate(userId, updateFields);
 
