@@ -94,7 +94,7 @@ async function updateProfile(req, res) {
       const finalPath = path.join(rootpath, "uploads", newFileName);
       imagePath = `/uploads/${newFileName}`;
 
-      uploadFile.mv(finalPath, (err) => {
+      await uploadFile.mv(finalPath, (err) => {
         if (err) {
           console.error("Error moving file:", err);
           return res.status(500).json({ msg: "Error uploading image" });
@@ -102,7 +102,7 @@ async function updateProfile(req, res) {
       });
     }
 
-    const updateFields = {
+    let updateFields = {
       businessname,
       image: imagePath,
       username,
@@ -112,7 +112,13 @@ async function updateProfile(req, res) {
 
     const updatedUser = await User.findByIdAndUpdate(userId, updateFields);
 
-    res.status(200).send({ msg: "Profile updated successfully", updatedUser });
+    const baseUrl = "https://himalayanjava-server.onrender.com";
+    const responseUser = {
+      ...updatedUser.toObject(),
+      image: baseUrl + updatedUser.image,
+    };
+
+    res.status(200).send({ msg: "Profile updated successfully", responseUser });
   } catch (err) {
     console.error(err);
     res.status(500).send({ msg: "Server error" });
