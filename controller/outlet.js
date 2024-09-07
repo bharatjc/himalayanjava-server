@@ -1,6 +1,6 @@
 const Outlet = require("../model/Outlet");
 const Joi = require("joi");
-const path = require("path");
+const cloudinary = require("../config/cloudinary");
 
 async function saveOutlet(req, res) {
   try {
@@ -34,24 +34,28 @@ async function saveOutlet(req, res) {
       });
     }
 
-    let uploadFile = req.files?.image;
-    let image = "";
-    if (uploadFile) {
-      let extension = path.extname(uploadFile.name);
-      let fileName = path.parse(uploadFile.name).name;
-      let rootpath = path.resolve();
-      fileName = `${fileName}-${Date.now()}${extension}`;
-      let finalPath = path.join(rootpath, "uploads", fileName);
-      image = `/uploads/${fileName}`;
-      uploadFile.mv(finalPath, (err) => {
-        console.log({ err });
+    let imageUrl = "";
+    if (req.files?.image) {
+      const uploadFile = req.files.image;
+      imageUrl = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { resource_type: "image" },
+          (error, result) => {
+            if (error) {
+              reject("Image upload failed");
+            } else {
+              resolve(result.secure_url);
+            }
+          }
+        );
+        stream.end(uploadFile.data);
       });
     }
 
     let outlet = await Outlet.create({
       ...req.body,
       user: req.user._id,
-      image: image,
+      image: imageUrl,
     });
     return res.send(outlet);
   } catch (err) {
@@ -63,15 +67,7 @@ async function saveOutlet(req, res) {
 async function fetchOutlet(req, res) {
   try {
     let outlets = await Outlet.find();
-    const baseUrl = "https://himalayanjava-server.onrender.com";
-    const result = outlets.map((outlet) => {
-      const outletObject = outlet.toObject();
-      return {
-        ...outletObject,
-        image: `${baseUrl}${outletObject.image}`,
-      };
-    });
-    res.send(result);
+    res.send(outlets);
   } catch (err) {
     res.status(500).send("Server Error");
   }

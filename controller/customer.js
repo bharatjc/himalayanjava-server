@@ -1,6 +1,6 @@
 const Customer = require("../model/Customer");
 const Joi = require("joi");
-const path = require("path");
+const cloudinary = require("../config/cloudinary");
 
 async function saveCustomer(req, res) {
   try {
@@ -37,23 +37,27 @@ async function saveCustomer(req, res) {
       });
     }
 
-    let uploadFile = req.files?.image;
-    let image = "";
-    if (uploadFile) {
-      let extension = path.extname(uploadFile.name);
-      let fileName = path.parse(uploadFile.name).name;
-      let rootpath = path.resolve();
-      fileName = `${fileName}-${Date.now()}${extension}`;
-      let finalPath = path.join(rootpath, "uploads", fileName);
-      image = `/uploads/${fileName}`;
-      uploadFile.mv(finalPath, (err) => {
-        console.log({ err });
+    let imageUrl = "";
+    if (req.files?.image) {
+      const uploadFile = req.files.image;
+      imageUrl = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { resource_type: "image" },
+          (error, result) => {
+            if (error) {
+              reject("Image upload failed");
+            } else {
+              resolve(result.secure_url);
+            }
+          }
+        );
+        stream.end(uploadFile.data);
       });
     }
 
     let customer = await Customer.create({
       ...req.body,
-      image: image,
+      image: imageUrl,
     });
     return res.send(customer);
   } catch (err) {
@@ -64,15 +68,7 @@ async function saveCustomer(req, res) {
 
 async function fetchCustomer(req, res) {
   try {
-    let customers = await Customer.find();
-    const baseUrl = "https://himalayanjava-server.onrender.com";
-    const result = customers.map((customer) => {
-      const customerObject = customer.toObject();
-      return {
-        ...customerObject,
-        image: `${baseUrl}${customerObject.image}`,
-      };
-    });
+    let result = await Customer.find();
     res.send(result);
   } catch (err) {
     res.status(500).send("Server Error");

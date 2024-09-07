@@ -1,6 +1,6 @@
 const Service = require("../model/Service");
 const Joi = require("joi");
-const path = require("path");
+const cloudinary = require("../config/cloudinary");
 
 async function saveService(req, res) {
   try {
@@ -32,24 +32,28 @@ async function saveService(req, res) {
       });
     }
 
-    let uploadFile = req.files?.image;
-    let image = "";
-    if (uploadFile) {
-      let extension = path.extname(uploadFile.name);
-      let fileName = path.parse(uploadFile.name).name;
-      let rootpath = path.resolve();
-      fileName = `${fileName}-${Date.now()}${extension}`;
-      let finalPath = path.join(rootpath, "uploads", fileName);
-      image = `/uploads/${fileName}`;
-      uploadFile.mv(finalPath, (err) => {
-        console.log({ err });
+    let imageUrl = "";
+    if (req.files?.image) {
+      const uploadFile = req.files.image;
+      imageUrl = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { resource_type: "image" },
+          (error, result) => {
+            if (error) {
+              reject("Image upload failed");
+            } else {
+              resolve(result.secure_url);
+            }
+          }
+        );
+        stream.end(uploadFile.data);
       });
     }
 
     let service = await Service.create({
       ...req.body,
       user: req.user._id,
-      image: image,
+      image: imageUrl,
     });
     return res.send(service);
   } catch (err) {
@@ -60,15 +64,7 @@ async function saveService(req, res) {
 async function fetchService(req, res) {
   try {
     let services = await Service.find();
-    const baseUrl = "https://himalayanjava-server.onrender.com";
-    const result = services.map((service) => {
-      const serviceObject = service.toObject();
-      return {
-        ...serviceObject,
-        image: `${baseUrl}${serviceObject.image}`,
-      };
-    });
-    res.send(result);
+    res.send(services);
   } catch (err) {
     res.status(500).send("Server Error");
   }

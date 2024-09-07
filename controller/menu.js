@@ -1,6 +1,7 @@
 const Menu = require("../model/Menu");
 const Joi = require("joi");
 const path = require("path");
+const cloudinary = require("../config/cloudinary");
 
 async function saveMenu(req, res) {
   try {
@@ -32,24 +33,28 @@ async function saveMenu(req, res) {
       });
     }
 
-    let uploadFile = req.files?.image;
-    let image = "";
-    if (uploadFile) {
-      let extension = path.extname(uploadFile.name);
-      let fileName = path.parse(uploadFile.name).name;
-      let rootpath = path.resolve();
-      fileName = `${fileName}-${Date.now()}${extension}`;
-      let finalPath = path.join(rootpath, "uploads", fileName);
-      image = `/uploads/${fileName}`;
-      uploadFile.mv(finalPath, (err) => {
-        console.log({ err });
+    let imageUrl = "";
+    if (req.files?.image) {
+      const uploadFile = req.files.image;
+      imageUrl = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { resource_type: "image" },
+          (error, result) => {
+            if (error) {
+              reject("Image upload failed");
+            } else {
+              resolve(result.secure_url);
+            }
+          }
+        );
+        stream.end(uploadFile.data);
       });
     }
 
     let menu = await Menu.create({
       ...req.body,
       user: req.user._id,
-      image: image,
+      image: imageUrl,
     });
     return res.send(menu);
   } catch (err) {
@@ -61,15 +66,7 @@ async function saveMenu(req, res) {
 async function fetchMenu(req, res) {
   try {
     let menus = await Menu.find();
-    const baseUrl = "https://himalayanjava-server.onrender.com";
-    const result = menus.map((menu) => {
-      const menuObject = menu.toObject();
-      return {
-        ...menuObject,
-        image: `${baseUrl}${menuObject.image}`,
-      };
-    });
-    res.send(result);
+    res.send(menus);
   } catch (err) {
     res.status(500).send("Server Error");
   }

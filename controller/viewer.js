@@ -40,13 +40,7 @@ async function saveViewer(req, res) {
 async function fetchViewer(req, res) {
   try {
     let viewers = await Viewer.find();
-    const result = viewers.map((viewer) => {
-      const viewerObject = viewer.toObject();
-      return {
-        ...viewerObject,
-      };
-    });
-    res.send(result);
+    res.send(viewers);
   } catch (err) {
     res.status(500).send("Server Error");
   }

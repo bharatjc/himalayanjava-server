@@ -3,14 +3,7 @@ const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const User = require("../model/User");
 require("dotenv").config();
-const path = require("path");
 const cloudinary = require("../config/cloudinary");
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 async function signup(req, res) {
   try {
@@ -71,14 +64,6 @@ async function login(req, res) {
       const JWT_SECRET_KEY = process.env.SECRET_KEY;
       let token = jwt.sign(user, JWT_SECRET_KEY);
       user.token = token;
-
-      if (user.image) {
-        let baseUrl = "https://himalayanjava-server.onrender.com";
-        let result = baseUrl + user.image;
-        user.image = result;
-      } else {
-        user.image = "";
-      }
       res.send({ data: user });
       return;
     }
@@ -137,31 +122,8 @@ async function updateProfile(req, res) {
   }
 }
 
-async function fetchUser(req, res) {
-  try {
-    let { userId } = req.params;
-    let baseUrl = "https://himalayanjava-server.onrender.com";
-    let userdetails = await User.findOne({ _id: userId });
-    if (userdetails) {
-      const userObject = userdetails.toObject();
-      const realImage = userdetails.image;
-      let result = {
-        ...userObject,
-        image: baseUrl + realImage,
-      };
-      res.send(result);
-    } else {
-      res.status(404).send("User not found");
-    }
-  } catch (err) {
-    console.log({ Error: err });
-    res.status(500).send({ msg: "Server error" });
-  }
-}
-
 module.exports = {
   signup: signup,
   login: login,
   updateProfile: updateProfile,
-  fetchUser: fetchUser,
 };
