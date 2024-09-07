@@ -4,6 +4,13 @@ const jwt = require("jsonwebtoken");
 const User = require("../model/User");
 require("dotenv").config();
 const path = require("path");
+const cloudinary = require("../config/cloudinary");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 async function signup(req, res) {
   try {
@@ -84,38 +91,43 @@ async function updateProfile(req, res) {
     const { userId } = req.params;
     const { businessname, username, email, password } = req.body;
 
-    let imagePath = "";
+    let imageUrl = "";
     if (req.files?.image) {
       const uploadFile = req.files.image;
-      const extension = path.extname(uploadFile.name);
-      const fileName = path.parse(uploadFile.name).name;
-      const rootpath = path.resolve();
-      const newFileName = `${fileName}-${Date.now()}${extension}`;
-      const finalPath = path.join(rootpath, "uploads", newFileName);
-      imagePath = `/uploads/${newFileName}`;
-
-      await uploadFile.mv(finalPath, (err) => {
-        if (err) {
-          console.error("Error moving file:", err);
-          return res.status(500).json({ msg: "Error uploading image" });
-        }
+      imageUrl = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { resource_type: "image" },
+          (error, result) => {
+            if (error) {
+              reject("Image upload failed");
+            } else {
+              resolve(result.secure_url);
+            }
+          }
+        );
+        stream.end(uploadFile.data);
       });
     }
 
     let updateFields = {
       businessname,
-      image: imagePath,
+      image: imageUrl,
       username,
       email,
       password,
     };
 
-    const updatedUser = await User.findByIdAndUpdate(userId, updateFields);
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
+      new: true,
+    });
 
-    const baseUrl = "https://himalayanjava-server.onrender.com";
+    if (!updatedUser) {
+      return res.status(404).send({ msg: "User not found" });
+    }
+
     const responseUser = {
       ...updatedUser.toObject(),
-      image: baseUrl + updatedUser.image,
+      image: updatedUser.image,
     };
 
     res.status(200).send({ msg: "Profile updated successfully", responseUser });

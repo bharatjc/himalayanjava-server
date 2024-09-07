@@ -1,0 +1,66 @@
+async function updateProfile(req, res) {
+  try {
+    const { userId } = req.params;
+    const { businessname, username, email, password } = req.body;
+
+    let imageUrl = "";
+    if (req.files?.image) {
+      const uploadFile = req.files.image;
+      // const extension = path.extname(uploadFile.name);
+      // const fileName = path.parse(uploadFile.name).name;
+      // const rootpath = path.resolve();
+      // const newFileName = `${fileName}-${Date.now()}${extension}`;
+      // const finalPath = path.join(rootpath, "uploads", newFileName);
+      // imagePath = `/uploads/${newFileName}`;
+
+      // await uploadFile.mv(finalPath, (err) => {
+      //   if (err) {
+      //     console.error("Error moving file:", err);
+      //     return res.status(500).json({ msg: "Error uploading image" });
+      //   }
+      // });
+
+      if (!uploadFile || !uploadFile.data) {
+        return res
+          .status(400)
+          .json({ msg: "No file uploaded or file data is missing" });
+      }
+
+      const result = await cloudinary.uploader.upload_stream(
+        { resource_type: "auto" },
+        (error, result) => {
+          if (error) {
+            console.error("Cloudinary upload error:", error);
+            return res
+              .status(500)
+              .json({ msg: "Error uploading image to Cloudinary" });
+          }
+          imageUrl = result.secure_url; // Set imageUrl to the URL returned by Cloudinary
+        }
+      );
+    }
+
+    let updateFields = {
+      businessname,
+      image: imageUrl,
+      username,
+      email,
+      password,
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields);
+
+    // const baseUrl = "https://himalayanjava-server.onrender.com";
+    const responseUser = {
+      ...updatedUser.toObject(),
+      image:
+        // baseUrl +
+        updatedUser.image,
+    };
+
+    res.status(200).send({ msg: "Profile updated successfully", responseUser });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ msg: "Server error" });
+  }
+}
