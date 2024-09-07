@@ -80,7 +80,8 @@ async function fetchLatestCustomers(req, res) {
     const total = await Customer.countDocuments({});
     const latestCustomers = await Customer.find({})
       .sort({ createdAt: -1 })
-      .limit(5);
+      .limit(5)
+      .select("name");
     res.send({
       customers: latestCustomers,
       total: total,
