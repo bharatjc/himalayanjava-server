@@ -75,4 +75,19 @@ async function fetchCustomer(req, res) {
   }
 }
 
-module.exports = { saveCustomer, fetchCustomer };
+async function fetchLatestCustomers(req, res) {
+  try {
+    const total = await Customer.countDocuments({});
+    const latestCustomers = await Customer.find({})
+      .sort({ createdAt: -1 })
+      .limit(5);
+    res.send({
+      customers: latestCustomers,
+      total: total,
+    });
+  } catch (error) {
+    console.error("Error fetching latest users:", error);
+  }
+}
+
+module.exports = { saveCustomer, fetchCustomer, fetchLatestCustomers };
