@@ -73,4 +73,16 @@ async function fetchOutlet(req, res) {
   }
 }
 
-module.exports = { saveOutlet, fetchOutlet };
+async function popularOutlets(req, res) {
+  try {
+    const popularOutlets = await Outlet.find({})
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select("location special");
+    res.send({ popularOutlets });
+  } catch (error) {
+    console.error("Error fetching latest users:", error);
+  }
+}
+
+module.exports = { saveOutlet, fetchOutlet, popularOutlets };

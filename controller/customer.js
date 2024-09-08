@@ -81,7 +81,7 @@ async function fetchLatestCustomers(req, res) {
     const latestCustomers = await Customer.find({})
       .sort({ createdAt: -1 })
       .limit(4)
-      .select("name");
+      .select("name comment");
     res.send({
       customers: latestCustomers,
       total: total,

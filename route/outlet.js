@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const { saveOutlet, fetchOutlet } = require("../controller/outlet");
+const {
+  saveOutlet,
+  fetchOutlet,
+  popularOutlets,
+} = require("../controller/outlet");
 const { checkAuthentication } = require("../middleware/checkAuthentication");
 
 router.post("/outlet", checkAuthentication, saveOutlet);
-router.get("/outlet", checkAuthentication, fetchOutlet);
+router.get("/outlet", fetchOutlet);
+router.get("/popularoutlet", popularOutlets);
 
 module.exports = router;
