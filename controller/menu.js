@@ -64,8 +64,8 @@ async function saveMenu(req, res) {
 
 async function fetchMenu(req, res) {
   try {
-    let menus = await Menu.find();
-    res.send(menus);
+    let result = await Menu.find({}).sort({ createdAt: -1 }).limit(20);
+    res.send({ menus: result, limit: 20 });
   } catch (err) {
     res.status(500).send("Server Error");
   }

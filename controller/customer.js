@@ -68,8 +68,8 @@ async function saveCustomer(req, res) {
 
 async function fetchCustomer(req, res) {
   try {
-    let result = await Customer.find();
-    res.send(result);
+    let result = await Customer.find({}).sort({ createdAt: -1 }).limit(4);
+    res.send({ customers: result, limit: 4 });
   } catch (err) {
     res.status(500).send("Server Error");
   }

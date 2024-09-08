@@ -63,8 +63,8 @@ async function saveService(req, res) {
 
 async function fetchService(req, res) {
   try {
-    let services = await Service.find();
-    res.send(services);
+    let result = await Service.find().sort({ createdAt: -1 }).limit(20);
+    res.send({ services: result, limit: 20 });
   } catch (err) {
     res.status(500).send("Server Error");
   }

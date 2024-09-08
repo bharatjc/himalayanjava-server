@@ -66,8 +66,8 @@ async function saveOutlet(req, res) {
 
 async function fetchOutlet(req, res) {
   try {
-    let outlets = await Outlet.find();
-    res.send(outlets);
+    let result = await Outlet.find().sort({ createdAt: -1 }).limit(20);
+    res.send({ outlets: result, limit: 20 });
   } catch (err) {
     res.status(500).send("Server Error");
   }
