@@ -1,6 +1,5 @@
 const Menu = require("../model/Menu");
 const Joi = require("joi");
-const path = require("path");
 const cloudinary = require("../config/cloudinary");
 
 async function saveMenu(req, res) {
