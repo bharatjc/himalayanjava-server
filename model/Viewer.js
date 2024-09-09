@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const viewerSchema = new Schema({
   name: String,
   email: String,
-  phone: Number,
+  phone: String,
   subject: String,
   message: String,
 });
