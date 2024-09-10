@@ -87,8 +87,8 @@ async function popularOutlets(req, res) {
 
 async function deleteOutlet(req, res) {
   try {
-    const outletId = req.params.outletId;
-    await Outlet.deleteOne({ _id: outletId });
+    const location = req.params.location;
+    await Outlet.deleteOne({ location });
     return res.send("Outlet deleted successfully");
   } catch (err) {
     console.log("Error", err);

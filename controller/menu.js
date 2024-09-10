@@ -73,8 +73,8 @@ async function fetchMenu(req, res) {
 
 async function deleteMenu(req, res) {
   try {
-    const menuId = req.params.menuId;
-    await Menu.deleteOne({ _id: menuId });
+    const menuName = req.params.menu;
+    await Menu.deleteOne({ menuName });
     return res.send("Menu deleted successfully");
   } catch (err) {
     console.log("Error", err);

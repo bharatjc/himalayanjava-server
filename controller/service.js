@@ -72,8 +72,8 @@ async function fetchService(req, res) {
 
 async function deleteService(req, res) {
   try {
-    const serviceId = req.params.serviceId;
-    await Service.deleteOne({ _id: serviceId });
+    const title = req.params.title;
+    await Service.deleteOne({ title });
     return res.send("Service removed successfully");
   } catch (err) {
     console.log("Error", err);

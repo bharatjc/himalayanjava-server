@@ -9,6 +9,6 @@ const { checkAuthentication } = require("../middleware/checkAuthentication");
 
 router.post("/service", checkAuthentication, saveService);
 router.get("/service", fetchService);
-router.delete("/deleteservice/:serviceId", deleteService);
+router.delete("/deleteservice/:title", deleteService);
 
 module.exports = router;

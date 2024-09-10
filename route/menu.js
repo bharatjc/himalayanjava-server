@@ -5,6 +5,6 @@ const { checkAuthentication } = require("../middleware/checkAuthentication");
 
 router.post("/menu", checkAuthentication, saveMenu);
 router.get("/menu", fetchMenu);
-router.delete("/deletemenu/:menuId", deleteMenu);
+router.delete("/deletemenu/:menu", deleteMenu);
 
 module.exports = router;
