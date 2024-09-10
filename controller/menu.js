@@ -71,4 +71,15 @@ async function fetchMenu(req, res) {
   }
 }
 
-module.exports = { saveMenu, fetchMenu };
+async function deleteMenu(req, res) {
+  try {
+    const menuId = req.params.menuId;
+    await Menu.deleteOne({ _id: menuId });
+    return res.send("Menu deleted successfully");
+  } catch (err) {
+    console.log("Error", err);
+    return res.send(`Error: ${err.message}`);
+  }
+}
+
+module.exports = { saveMenu, fetchMenu, deleteMenu };

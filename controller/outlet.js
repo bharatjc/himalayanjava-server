@@ -85,4 +85,15 @@ async function popularOutlets(req, res) {
   }
 }
 
-module.exports = { saveOutlet, fetchOutlet, popularOutlets };
+async function deleteOutlet(req, res) {
+  try {
+    const outletId = req.params.outletId;
+    await Outlet.deleteOne({ _id: outletId });
+    return res.send("Outlet deleted successfully");
+  } catch (err) {
+    console.log("Error", err);
+    return res.send(`Error: ${err.message}`);
+  }
+}
+
+module.exports = { saveOutlet, fetchOutlet, popularOutlets, deleteOutlet };

@@ -70,4 +70,15 @@ async function fetchService(req, res) {
   }
 }
 
-module.exports = { saveService, fetchService };
+async function deleteService(req, res) {
+  try {
+    const serviceId = req.params.serviceId;
+    await Service.deleteOne({ _id: serviceId });
+    return res.send("Service removed successfully");
+  } catch (err) {
+    console.log("Error", err);
+    return res.send(`Error: ${err.message}`);
+  }
+}
+
+module.exports = { saveService, fetchService, deleteService };
