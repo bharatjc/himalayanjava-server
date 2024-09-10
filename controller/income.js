@@ -4,8 +4,8 @@ const Joi = require("joi");
 async function saveIncome(req, res) {
   try {
     const IncomeSchema = Joi.object({
-      sales: Joi.number().required(),
-      expenses: Joi.number().required(),
+      sales: Joi.number().required().min(1),
+      expenses: Joi.number().required().min(1),
     });
     let status = IncomeSchema.validate(req.body, {
       allowUnknown: true,
