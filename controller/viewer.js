@@ -46,4 +46,31 @@ async function fetchViewer(req, res) {
   }
 }
 
-module.exports = { saveViewer, fetchViewer };
+async function featureName(req, res) {
+  try {
+    const VisitorSchema = Joi.object({
+      visitor: Joi.string().required().max(15),
+    });
+    let status = VisitorSchema.validate(req.body, {
+      abortEarly: false,
+    });
+    if (status.error) {
+      let errors = status.error.details.map((detail) => {
+        return {
+          message: detail.message,
+          field: detail.context.key,
+        };
+      });
+      return res.status(200).send({
+        msg: "Bad request",
+        errors,
+      });
+    }
+    let visitor = req.body.visitor;
+    res.status(400).send({ visitor });
+  } catch (err) {
+    res.status(500).send("Server Error");
+  }
+}
+
+module.exports = { saveViewer, fetchViewer, featureName };
