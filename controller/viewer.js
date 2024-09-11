@@ -61,7 +61,7 @@ async function featureName(req, res) {
           field: detail.context.key,
         };
       });
-      return res.status(200).send({
+      return res.status(400).send({
         msg: "Bad request",
         errors,
       });
