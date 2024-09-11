@@ -67,7 +67,7 @@ async function featureName(req, res) {
       });
     }
     let visitor = req.body.visitor;
-    res.status(400).send({ visitor });
+    res.status(200).send({ visitor });
   } catch (err) {
     res.status(500).send("Server Error");
   }
