@@ -58,4 +58,23 @@ async function fetchOrder(req, res) {
   }
 }
 
-module.exports = { saveOrder, fetchOrder };
+async function updateStatus(req, res) {
+  try {
+    const { cId } = req.params;
+    const { status } = req.body;
+
+    const updatedStatus = {
+      ...req.body,
+      status,
+    };
+    const updatedOrder = await Order.findByIdAndUpdate(cId, updatedStatus, {
+      new: true,
+    });
+    res.status(200).send({ msg: "Status updated successfully", updatedOrder });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ msg: "Server error" });
+  }
+}
+
+module.exports = { saveOrder, fetchOrder, updateStatus };

@@ -17,6 +17,7 @@ const orderSchema = new Schema(
     province: String,
     city: String,
     total: Number,
+    status: String,
   },
   {
     timestamps: true,
