@@ -41,17 +41,11 @@ async function saveOrder(req, res) {
     let existingOrder = await Order.findOne({ cardNo: req.body.cardNo });
 
     if (existingOrder) {
-      if (!existingOrder.orders) {
-        existingOrder.orders = [];
+      if (!existingOrder.products) {
+        existingOrder.products = [];
       }
 
-      existingOrder.orders.push({
-        products: req.body.products,
-        total: req.body.total,
-        date: new Date(),
-        city: req.body.city,
-        province: req.body.province,
-      });
+      existingOrder.products = existingOrder.products.concat(req.body.products);
 
       await existingOrder.save();
       return res.send({ order: existingOrder });
@@ -60,15 +54,10 @@ async function saveOrder(req, res) {
         customer: req.body.customer,
         email: req.body.email,
         cardNo: req.body.cardNo,
-        orders: [
-          {
-            products: req.body.products,
-            total: req.body.total,
-            date: new Date(),
-            city: req.body.city,
-            province: req.body.province,
-          },
-        ],
+        products: req.body.products,
+        total: req.body.total,
+        city: req.body.city,
+        province: req.body.province,
       });
 
       return res.send({ order: newOrder });
