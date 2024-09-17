@@ -6,17 +6,22 @@ const orderSchema = new Schema(
     customer: String,
     email: String,
     cardNo: String,
-    products: [
+    orders: [
       {
-        name: String,
-        price: Number,
-        quantity: Number,
+        products: [
+          {
+            name: String,
+            price: Number,
+            quantity: Number,
+            total: Number,
+          },
+        ],
+        province: String,
+        city: String,
         total: Number,
+        date: { type: Date, default: Date.now },
       },
     ],
-    province: String,
-    city: String,
-    total: Number,
     status: String,
   },
   {

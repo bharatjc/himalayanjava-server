@@ -38,10 +38,41 @@ async function saveOrder(req, res) {
       });
     }
 
-    let order = await Order.create({
-      ...req.body,
-    });
-    return res.send({ order });
+    let existingOrder = await Order.findOne({ cardNo: req.body.cardNo });
+
+    if (existingOrder) {
+      if (!existingOrder.orders) {
+        existingOrder.orders = [];
+      }
+
+      existingOrder.orders.push({
+        products: req.body.products,
+        total: req.body.total,
+        date: new Date(),
+        city: req.body.city,
+        province: req.body.province,
+      });
+
+      await existingOrder.save();
+      return res.send({ order: existingOrder });
+    } else {
+      let newOrder = await Order.create({
+        customer: req.body.customer,
+        email: req.body.email,
+        cardNo: req.body.cardNo,
+        orders: [
+          {
+            products: req.body.products,
+            total: req.body.total,
+            date: new Date(),
+            city: req.body.city,
+            province: req.body.province,
+          },
+        ],
+      });
+
+      return res.send({ order: newOrder });
+    }
   } catch (err) {
     console.error(err);
     return res.status(500).send(`Error: ${err.message}`);
@@ -77,4 +108,15 @@ async function updateStatus(req, res) {
   }
 }
 
-module.exports = { saveOrder, fetchOrder, updateStatus };
+async function getPurchaseHistory(req, res) {
+  try {
+    const { cardNo } = req.params;
+    let history = await Order.find({ cardNo });
+    res.status(200).send({ history });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ msg: "Server error" });
+  }
+}
+
+module.exports = { saveOrder, fetchOrder, updateStatus, getPurchaseHistory };
