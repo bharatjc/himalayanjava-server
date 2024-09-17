@@ -100,7 +100,7 @@ async function updateStatus(req, res) {
 async function getPurchaseHistory(req, res) {
   try {
     const { cardNo } = req.params;
-    let history = await Order.find({ cardNo });
+    let history = await Order.find({ cardNo }).sort({ createdAt: -1 });
     res.status(200).send({ history });
   } catch (err) {
     console.log(err);
